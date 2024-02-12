@@ -136,6 +136,13 @@ class Manticore
         );
     }
 
+    public function optimize(?bool $sync = false)
+    {
+        return $this->_index->optimize(
+            $sync
+        );
+    }
+
     private function _crc32(mixed $value): int
     {
         return crc32(
