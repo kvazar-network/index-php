@@ -1,6 +1,6 @@
 {
     "name": "kvazar/index",
-    "description": "Manticore Database API",
+    "description": "Common Index API (DB model)",
     "type": "library",
     "require": {
         "manticoresoftware/manticoresearch-php": "^3.1"
