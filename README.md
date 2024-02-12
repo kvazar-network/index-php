@@ -1,4 +1,4 @@
-# Common Index API (DB model)
+# Common Index API
 
 Versioned database toolkit to create and read Manticore index in different applications
 
