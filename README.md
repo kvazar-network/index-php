@@ -9,6 +9,7 @@ Versioned drivers to create and read KVAZAR index in different applications
 ## Usage
 
 * [webapp](https://github.com/kvazar-network/webapp)
+* [crawler](https://github.com/kvazar-network/crawler)
 
 ## Drivers
 
