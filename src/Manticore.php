@@ -131,6 +131,61 @@ class Manticore
         );
     }
 
+    public function get(
+        ?string $search = '',
+        ?array  $filter = [],
+        ?array  $sort   = ['id' => 'desc'],
+        ?int    $offset = 0,
+        ?int    $limit  = 2
+    ): array
+    {
+        $records = [];
+
+        $search = $this->_index->search(
+            $search
+        );
+
+        foreach ($filter as $key => $value)
+        {
+            $search->filter(
+                $key,
+                $value
+            );
+        }
+
+        foreach ($sort as $key => $value)
+        {
+            $search->sort(
+                $key,
+                $value
+            );
+        }
+
+        $search->offset(
+            $offset
+        );
+
+        $search->limit(
+            $limit
+        );
+
+        foreach ($search->get() as $record)
+        {
+            $records[$record->getId()] =
+            [
+                'time'        => $record->get('time'),
+                'size'        => $record->get('size'),
+                'block'       => $record->get('block'),
+                'namespace'   => $record->get('namespace'),
+                'transaction' => $record->get('transaction'),
+                'key'         => $record->get('key'),
+                'value'       => $record->get('value')
+            ];
+         }
+
+        return $records;
+    }
+
     public function drop(?bool $silent = false)
     {
         return $this->_index->drop(
