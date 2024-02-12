@@ -17,8 +17,7 @@ class Manticore
         ?array  $meta = [],
         ?string $host = '127.0.0.1',
         ?int    $port = 9308
-    )
-    {
+    ) {
         $this->_client = new Client(
             [
                 'host' => $host,
@@ -32,6 +31,22 @@ class Manticore
 
         $this->_index->create(
             [
+                'crc32namespace' =>
+                [
+                    'type' => 'int'
+                ],
+                'crc32transaction' =>
+                [
+                    'type' => 'int'
+                ],
+                'crc32key' =>
+                [
+                    'type' => 'int'
+                ],
+                'crc32value' =>
+                [
+                    'type' => 'int'
+                ],
                 'block' =>
                 [
                     'type' => 'int'
@@ -64,33 +79,33 @@ class Manticore
         string $transaction,
         string $key,
         string $value
-    ): int
-    {
-        $crc32transaction = crc32(
-            $transaction
+    ) {
+        return $this->_index->addDocument(
+            [
+                'crc32namespace'   => crc32(
+                    $namespace
+                ),
+                'crc32transaction' => crc32(
+                    $transaction
+                ),
+                'crc32key'         => crc32(
+                    $key
+                ),
+                'crc32value'       => crc32(
+                    $value
+                ),
+                'block'            => $block,
+                'namespace'        => $namespace,
+                'transaction'      => $transaction,
+                'key'              => $key,
+                'value'            => $value
+            ]
         );
-
-        if (!$this->_index->getDocumentById($crc32transaction))
-        {
-            $this->_index->addDocument(
-                [
-                    'block'            => $block,
-                    'namespace'        => $namespace,
-                    'transaction'      => $transaction,
-                    'key'              => $key,
-                    'value'            => $value
-                ],
-                $crc32transaction
-            );
-        }
-
-        return $crc32transaction;
     }
 
     public function drop(
         ?bool $silent = false
-    )
-    {
+    ) {
         return $this->_index->drop(
             $silent
         );
