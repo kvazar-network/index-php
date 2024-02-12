@@ -17,7 +17,8 @@ class Manticore
     private const OP_KEVA_DELETE    = 3;
     private const OP_HASH160        = 4;
     private const OP_RETURN         = 5;
-    private const OP_NOP            = 6;
+    private const OP_DUP            = 6;
+    private const OP_NOP            = 7;
 
     public function __construct(
         ?string $name = 'kvazar',
@@ -169,6 +170,9 @@ class Manticore
 
             case 'OP_RETURN':
                 return self::OP_RETURN;
+
+            case 'OP_DUP':
+                return self::OP_DUP;
 
             case 'OP_NOP':
                 return self::OP_NOP;
