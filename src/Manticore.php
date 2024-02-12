@@ -132,17 +132,17 @@ class Manticore
     }
 
     public function get(
-        ?string $search = '',
+        ?string $query  = '',
         ?array  $filter = [],
         ?array  $sort   = ['id' => 'desc'],
         ?int    $offset = 0,
-        ?int    $limit  = 2
+        ?int    $limit  = 10
     ): array
     {
         $records = [];
 
         $search = $this->_index->search(
-            $search
+            $query
         );
 
         foreach ($filter as $key => $value)
