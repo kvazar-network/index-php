@@ -1,7 +1,11 @@
-# Common Index API
+# KVAZAR Index Driver
 
-Versioned database toolkit to create and read Manticore index in different KVAZAR applications
+Versioned drivers to create and read KVAZAR index in different applications
 
-Requirement for:
+## Usage
 
 * [webapp](https://github.com/kvazar-network/webapp)
+
+## Drivers
+
+* [Manticore](https://github.com/manticoresoftware) search server
