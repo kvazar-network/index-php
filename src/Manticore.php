@@ -4,20 +4,22 @@ declare(strict_types=1);
 
 namespace Kvazar\Index;
 
+use Manticoresearch\Client;
+use Manticoresearch\Index;
+
 class Manticore
 {
     private \Manticoresearch\Client $_client;
-
-    private $_index;
+    private \Manticoresearch\Index  $_index;
 
     public function __construct(
         ?string $name = 'kvazar',
+        ?array  $meta = [],
         ?string $host = '127.0.0.1',
-        ?int    $port = 9308,
-        ?bool   $drop = false
+        ?int    $port = 9308
     )
     {
-        $this->_client = new \Manticoresearch\Client(
+        $this->_client = new Client(
             [
                 'host' => $host,
                 'port' => $port,
@@ -28,39 +30,69 @@ class Manticore
             $name
         );
 
-        if ($drop)
+        $this->_index->create(
+            [
+                'block' =>
+                [
+                    'type' => 'int'
+                ],
+                'namespace' =>
+                [
+                    'type' => 'text'
+                ],
+                'transaction' =>
+                [
+                    'type' => 'text'
+                ],
+                'key' =>
+                [
+                    'type' => 'text'
+                ],
+                'value' =>
+                [
+                    'type' => 'text'
+                ]
+            ],
+            $meta,
+            true
+        );
+    }
+
+    public function add(
+        int    $block,
+        string $namespace,
+        string $transaction,
+        string $key,
+        string $value
+    ): int
+    {
+        $crc32transaction = crc32(
+            $transaction
+        );
+
+        if (!$this->_index->getDocumentById($crc32transaction))
         {
-            $this->_index->drop(
-                true
+            $this->_index->addDocument(
+                [
+                    'block'            => $block,
+                    'namespace'        => $namespace,
+                    'transaction'      => $transaction,
+                    'key'              => $key,
+                    'value'            => $value
+                ],
+                $crc32transaction
             );
         }
 
-        if (!$this->_index->status())
-        {
-            $this->_index->create(
-                [
-                    'block' =>
-                    [
-                        'type' => 'int'
-                    ],
-                    'namespace' =>
-                    [
-                        'type' => 'text'
-                    ],
-                    'txid' =>
-                    [
-                        'type' => 'text'
-                    ],
-                    'key' =>
-                    [
-                        'type' => 'text'
-                    ],
-                    'value' =>
-                    [
-                        'type' => 'text'
-                    ]
-                ]
-            );
-        }
+        return $crc32transaction;
+    }
+
+    public function drop(
+        ?bool $silent = false
+    )
+    {
+        return $this->_index->drop(
+            $silent
+        );
     }
 }
