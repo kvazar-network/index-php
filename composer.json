@@ -1,0 +1,14 @@
+{
+    "name": "kvazar/index",
+    "description": "Manticore Database API",
+    "type": "library",
+    "require": {
+        "manticoresoftware/manticoresearch-php": "^3.1"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Kvazar\\Index\\": "src/"
+        }
+    }
+}
