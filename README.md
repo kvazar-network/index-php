@@ -4,7 +4,7 @@ Versioned drivers to create and read KVAZAR index in different applications
 
 ## Install
 
-`composer require kvazar/index:main-dev`
+`composer require kvazar/index:dev-main`
 
 ## Usage
 
