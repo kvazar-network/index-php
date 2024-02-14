@@ -339,7 +339,7 @@ class Manticore
             case is_string($value) && false === mb_detect_encoding($value, null, true):
                 return self::TYPE_BIN;
 
-            case is_string($value) && !preg_match('/\s/', $value) && base64_encode((string) base64_decode($value, true)) === $value:
+            case is_string($value) && base64_encode((string) base64_decode($value, true)) === $value:
                 return self::TYPE_BASE_64;
 
             case is_string($value) && !is_numeric($value) && json_encode(json_decode($value)) === $value:
