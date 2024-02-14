@@ -21,15 +21,17 @@ class Manticore
     private const OP_DUP            = 400;
     private const OP_NOP            = 500;
 
-    private const TYPE_TEXT         = 100;
-    private const TYPE_BIN          = 200;
-    private const TYPE_JSON         = 300;
-    private const TYPE_XML          = 400;
-    private const TYPE_BASE_64      = 500;
-    private const TYPE_BOOL         = 600;
-    private const TYPE_NULL         = 700;
-    private const TYPE_ARRAY        = 800;
-    private const TYPE_OBJECT       = 900;
+    private const TYPE_NULL         = 0;
+    private const TYPE_BOOL         = 1;
+    private const TYPE_STRING       = 100;
+    private const TYPE_BIN          = 110;
+    private const TYPE_JSON         = 120;
+    private const TYPE_XML          = 130;
+    private const TYPE_BASE_64      = 140;
+    private const TYPE_INT          = 200;
+    private const TYPE_FLOAT        = 210;
+    private const TYPE_ARRAY        = 300;
+    private const TYPE_OBJECT       = 400;
 
     public function __construct(
         ?string $name = 'kvazar',
@@ -124,7 +126,7 @@ class Manticore
     ) {
 
         // Manticore can store text data only, convert non-string types to Base64
-        if (self::TYPE_TEXT !== $typeKey = $this->_type($key))
+        if (self::TYPE_STRING !== $typeKey = $this->_type($key))
         {
             if (false === $key = json_encode($key))
             {
@@ -132,7 +134,7 @@ class Manticore
             }
         }
 
-        if (self::TYPE_TEXT !== $typeValue = $this->_type($value))
+        if (self::TYPE_STRING !== $typeValue = $this->_type($value))
         {
             if (false === $value = json_encode($value))
             {
@@ -215,7 +217,7 @@ class Manticore
         foreach ($search->get() as $record)
         {
             // Raw data stored as JSON encoded string
-            if ($record->get('key_type') === self::TYPE_TEXT)
+            if ($record->get('key_type') === self::TYPE_STRING)
             {
                 $key = $record->get('key');
             }
@@ -227,7 +229,7 @@ class Manticore
                 );
             }
 
-            if ($record->get('value_type') === self::TYPE_TEXT)
+            if ($record->get('value_type') === self::TYPE_STRING)
             {
                 $value = $record->get('value');
             }
@@ -310,6 +312,12 @@ class Manticore
     {
         switch (true)
         {
+            case is_int($value):
+                return self::TYPE_INT;
+
+            case is_float($value):
+                return self::TYPE_FLOAT;
+
             case is_bool($value):
                 return self::TYPE_BOOL;
 
@@ -335,7 +343,7 @@ class Manticore
                 return self::TYPE_XML;
 
             default:
-                return self::TYPE_TEXT;
+                return self::TYPE_STRING;
         }
     }
 }
