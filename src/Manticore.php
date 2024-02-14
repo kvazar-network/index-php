@@ -334,16 +334,16 @@ class Manticore
             case is_object($value):
                 return self::TYPE_OBJECT;
 
-            case false === mb_detect_encoding((string) $value, null, true):
+            case is_string($value) && false === mb_detect_encoding((string) $value, null, true):
                 return self::TYPE_BIN;
 
-            case base64_encode((string) base64_decode((string) $value, true)) === $value:
+            case is_string($value) && false === preg_match('/\s/', $value) && base64_encode((string) base64_decode((string) $value, true)) === $value:
                 return self::TYPE_BASE_64;
 
-            case json_encode((string) json_decode((string) $value)) === $value:
+            case is_string($value) && json_encode((string) json_decode((string) $value)) === $value:
                 return self::TYPE_JSON;
 
-            case false !== @simplexml_load_string((string) $value):
+            case is_string($value) && false !== @simplexml_load_string((string) $value):
                 return self::TYPE_XML;
 
             default:
