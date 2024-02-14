@@ -26,6 +26,10 @@ class Manticore
     private const TYPE_JSON         = 300;
     private const TYPE_XML          = 400;
     private const TYPE_BASE_64      = 500;
+    private const TYPE_BOOL         = 600;
+    private const TYPE_NULL         = 700;
+    private const TYPE_ARRAY        = 800;
+    private const TYPE_OBJECT       = 900;
 
     public function __construct(
         ?string $name = 'kvazar',
@@ -118,6 +122,24 @@ class Manticore
         mixed  $key,
         mixed  $value
     ) {
+
+        // Manticore can store text data only, convert non-string types to Base64
+        if (self::TYPE_TEXT !== $typeKey = $this->_type($key))
+        {
+            if (false === $key = json_encode($key))
+            {
+                throw new Exception();
+            }
+        }
+
+        if (self::TYPE_TEXT !== $typeValue = $this->_type($value))
+        {
+            if (false === $value = json_encode($value))
+            {
+                throw new Exception();
+            }
+        }
+
         return $this->_index->addDocument(
             [
                 'crc32_namespace'   => $this->_crc32(
@@ -133,14 +155,8 @@ class Manticore
                     $value
                 ),
 
-                'type_key'          => $this->_type(
-                    $key,
-                    $typeKey
-                ),
-                'type_value'        => $this->_type(
-                    $value,
-                    $typeValue
-                ),
+                'type_key'          => $typeKey,
+                'type_value'        => $typeValue,
 
                 'operation'         => $this->_operation(
                     $operation
@@ -152,9 +168,8 @@ class Manticore
                 'namespace'         => $namespace,
                 'transaction'       => $transaction,
 
-                // Manticore can't store binary data, convert to Base64 string
-                'key'               => $typeKey   === self::TYPE_BIN ? base64_encode($key)   : $key,
-                'value'             => $typeValue === self::TYPE_BIN ? base64_encode($value) : $value,
+                'key'               => $key,
+                'value'             => $value,
             ]
         );
     }
@@ -199,6 +214,31 @@ class Manticore
 
         foreach ($search->get() as $record)
         {
+            // Raw data stored as JSON encoded string
+            if ($record->get('key_type') === self::TYPE_TEXT)
+            {
+                $key = $record->get('key');
+            }
+
+            else
+            {
+                $key = json_decode(
+                    $record->get('key')
+                );
+            }
+
+            if ($record->get('value_type') === self::TYPE_TEXT)
+            {
+                $value = $record->get('value');
+            }
+
+            else
+            {
+                $value = json_decode(
+                    $record->get('value')
+                );
+            }
+
             $records[$record->getId()] =
             [
                 'time'        => $record->get('time'),
@@ -207,9 +247,8 @@ class Manticore
                 'namespace'   => $record->get('namespace'),
                 'transaction' => $record->get('transaction'),
 
-                // Raw data stored as Base64 string, convert back
-                'key'         => $record->get('key_type')   === self::TYPE_BIN ? base64_decode($record->get('key'))   : $record->get('key'),
-                'value'       => $record->get('value_type') === self::TYPE_BIN ? base64_decode($record->get('value')) : $record->get('value'),
+                'key'         => $key,
+                'value'       => $value,
             ];
          }
 
@@ -267,24 +306,36 @@ class Manticore
         }
     }
 
-    private function _type(mixed $value, ?int &$type = null): int
+    private function _type(mixed $value): int
     {
         switch (true)
         {
+            case is_bool($value):
+                return self::TYPE_BOOL;
+
+            case is_null($value):
+                return self::TYPE_NULL;
+
+            case is_array($value):
+                return self::TYPE_ARRAY;
+
+            case is_object($value):
+                return self::TYPE_OBJECT;
+
             case false === mb_detect_encoding((string) $value, null, true):
-                return $type = self::TYPE_BIN;
+                return self::TYPE_BIN;
 
             case base64_encode((string) base64_decode((string) $value, true)) === $value:
-                return $type = self::TYPE_BASE_64;
+                return self::TYPE_BASE_64;
 
             case json_encode((string) json_decode((string) $value)) === $value:
-                return $type = self::TYPE_JSON;
+                return self::TYPE_JSON;
 
             case false !== @simplexml_load_string((string) $value):
-                return $type = self::TYPE_XML;
+                return self::TYPE_XML;
 
             default:
-                return $type = self::TYPE_TEXT;
+                return self::TYPE_TEXT;
         }
     }
 }
