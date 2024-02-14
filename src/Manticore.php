@@ -277,7 +277,7 @@ class Manticore
             case base64_encode((string) base64_decode((string) $value, true)) === $value:
                 return $type = self::TYPE_BASE_64;
 
-            case null !== json_decode((string) $value, null, 2147483647):
+            case json_encode((string) json_decode((string) $value)) === $value:
                 return $type = self::TYPE_JSON;
 
             case false !== @simplexml_load_string((string) $value):
