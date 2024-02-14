@@ -274,7 +274,7 @@ class Manticore
             case false === mb_detect_encoding((string) $value, null, true):
                 return $type = self::TYPE_BIN;
 
-            case base64_encode(base64_decode((string) $value, true)) === $value:
+            case base64_encode((string) base64_decode((string) $value, true)) === $value:
                 return $type = self::TYPE_BASE_64;
 
             case null !== json_decode((string) $value, null, 2147483647):
