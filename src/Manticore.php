@@ -23,13 +23,13 @@ class Manticore
 
     private const TYPE_NULL         = 0;
     private const TYPE_BOOL         = 1;
-    private const TYPE_STRING       = 100;
-    private const TYPE_BIN          = 110;
-    private const TYPE_JSON         = 120;
-    private const TYPE_XML          = 130;
-    private const TYPE_BASE_64      = 140;
-    private const TYPE_INT          = 200;
-    private const TYPE_FLOAT        = 210;
+    private const TYPE_INT          = 100;
+    private const TYPE_FLOAT        = 110;
+    private const TYPE_STRING       = 200;
+    private const TYPE_BIN          = 210;
+    private const TYPE_JSON         = 220;
+    private const TYPE_XML          = 230;
+    private const TYPE_BASE_64      = 240;
     private const TYPE_ARRAY        = 300;
     private const TYPE_OBJECT       = 400;
 
