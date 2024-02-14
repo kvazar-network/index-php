@@ -217,7 +217,7 @@ class Manticore
         foreach ($search->get() as $record)
         {
             // Raw data stored as JSON encoded string
-            if ($record->get('key_type') === self::TYPE_STRING)
+            if ($record->get('type_key') === self::TYPE_STRING)
             {
                 $key = $record->get('key');
             }
