@@ -251,6 +251,12 @@ class Manticore
 
                 'key'         => $key,
                 'value'       => $value,
+
+                'type'        =>
+                [
+                    'key'   => $record->get('type_key'),
+                    'value' => $record->get('type_value')
+                ]
             ];
          }
 
