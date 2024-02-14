@@ -230,7 +230,7 @@ class Manticore
         );
     }
 
-    private function _crc32(mixed $value): int
+    private function _crc32(string $value): int
     {
         return crc32(
             $value
