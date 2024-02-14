@@ -236,7 +236,9 @@ class Manticore
 
             else
             {
-                $value = $record->get('type_value');
+                $value = json_decode(
+                    $record->get('value')
+                );
             }
 
             $records[$record->getId()] =
