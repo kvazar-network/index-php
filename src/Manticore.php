@@ -21,17 +21,17 @@ class Manticore
     private const OP_DUP            = 400;
     private const OP_NOP            = 500;
 
-    private const TYPE_NULL         = 0;
-    private const TYPE_BOOL         = 1;
-    private const TYPE_INT          = 100;
-    private const TYPE_FLOAT        = 110;
-    private const TYPE_STRING       = 200;
-    private const TYPE_BIN          = 210;
-    private const TYPE_JSON         = 220;
-    private const TYPE_XML          = 230;
-    private const TYPE_BASE_64      = 240;
-    private const TYPE_ARRAY        = 300;
-    private const TYPE_OBJECT       = 400;
+    public const TYPE_NULL          = 0;
+    public const TYPE_BOOL          = 1;
+    public const TYPE_INT           = 100;
+    public const TYPE_FLOAT         = 110;
+    public const TYPE_STRING        = 200;
+    public const TYPE_BIN           = 210;
+    public const TYPE_JSON          = 220;
+    public const TYPE_XML           = 230;
+    public const TYPE_BASE_64       = 240;
+    public const TYPE_ARRAY         = 300;
+    public const TYPE_OBJECT        = 400;
 
     public function __construct(
         ?string $name = 'kvazar',
