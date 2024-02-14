@@ -229,16 +229,14 @@ class Manticore
                 );
             }
 
-            if ($record->get('value_type') === self::TYPE_STRING)
+            if ($record->get('type_value') === self::TYPE_STRING)
             {
                 $value = $record->get('value');
             }
 
             else
             {
-                $value = json_decode(
-                    $record->get('value')
-                );
+                $value = $record->get('type_value');
             }
 
             $records[$record->getId()] =
