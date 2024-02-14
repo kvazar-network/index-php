@@ -280,7 +280,7 @@ class Manticore
             case null !== json_decode((string) $value, null, 2147483647):
                 return $type = self::TYPE_JSON;
 
-            case false !== simplexml_load_string((string) $value):
+            case false !== @simplexml_load_string((string) $value):
                 return $type = self::TYPE_XML;
 
             default:
