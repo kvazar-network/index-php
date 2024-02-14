@@ -12,13 +12,20 @@ class Manticore
     private \Manticoresearch\Client $_client;
     private \Manticoresearch\Index  $_index;
 
-    private const OP_KEVA_NAMESPACE = 1;
-    private const OP_KEVA_PUT       = 2;
-    private const OP_KEVA_DELETE    = 3;
-    private const OP_HASH160        = 4;
-    private const OP_RETURN         = 5;
-    private const OP_DUP            = 6;
-    private const OP_NOP            = 7;
+    private const OP_KEVA           = 100;
+    private const OP_KEVA_NAMESPACE = 110;
+    private const OP_KEVA_PUT       = 120;
+    private const OP_KEVA_DELETE    = 130;
+    private const OP_HASH160        = 200;
+    private const OP_RETURN         = 300;
+    private const OP_DUP            = 400;
+    private const OP_NOP            = 500;
+
+    private const TYPE_TEXT         = 100;
+    private const TYPE_BIN          = 200;
+    private const TYPE_JSON         = 300;
+    private const TYPE_XML          = 400;
+    private const TYPE_BASE_64      = 500;
 
     public function __construct(
         ?string $name = 'kvazar',
@@ -39,19 +46,27 @@ class Manticore
 
         $this->_index->create(
             [
-                'crc32namespace' =>
+                'crc32_namespace' =>
                 [
                     'type' => 'int'
                 ],
-                'crc32transaction' =>
+                'crc32_transaction' =>
                 [
                     'type' => 'int'
                 ],
-                'crc32key' =>
+                'crc32_key' =>
                 [
                     'type' => 'int'
                 ],
-                'crc32value' =>
+                'crc32_value' =>
+                [
+                    'type' => 'int'
+                ],
+                'type_key' =>
+                [
+                    'type' => 'int'
+                ],
+                'type_value' =>
                 [
                     'type' => 'int'
                 ],
@@ -100,33 +115,46 @@ class Manticore
         string $namespace,
         string $transaction,
         string $operation,
-        string $key,
-        string $value
+        mixed  $key,
+        mixed  $value
     ) {
         return $this->_index->addDocument(
             [
-                'crc32namespace'   => $this->_crc32(
+                'crc32_namespace'   => $this->_crc32(
                     $namespace
                 ),
-                'crc32transaction' => $this->_crc32(
+                'crc32_transaction' => $this->_crc32(
                     $transaction
                 ),
-                'crc32key'         => $this->_crc32(
+                'crc32_key'         => $this->_crc32(
                     $key
                 ),
-                'crc32value'       => $this->_crc32(
+                'crc32_value'       => $this->_crc32(
                     $value
                 ),
-                'operation'        => $this->_operation(
+
+                'type_key'          => $this->_type(
+                    $key,
+                    $typeKey
+                ),
+                'type_value'        => $this->_type(
+                    $value,
+                    $typeValue
+                ),
+
+                'operation'         => $this->_operation(
                     $operation
                 ),
-                'time'             => $time,
-                'size'             => $size,
-                'block'            => $block,
-                'namespace'        => $namespace,
-                'transaction'      => $transaction,
-                'key'              => $key,
-                'value'            => $value
+
+                'time'              => $time,
+                'size'              => $size,
+                'block'             => $block,
+                'namespace'         => $namespace,
+                'transaction'       => $transaction,
+
+                // Manticore can't store binary data, convert to Base64 string
+                'key'               => $typeKey   === self::TYPE_BIN ? base64_encode($key)   : $key,
+                'value'             => $typeValue === self::TYPE_BIN ? base64_encode($value) : $value,
             ]
         );
     }
@@ -178,8 +206,10 @@ class Manticore
                 'block'       => $record->get('block'),
                 'namespace'   => $record->get('namespace'),
                 'transaction' => $record->get('transaction'),
-                'key'         => $record->get('key'),
-                'value'       => $record->get('value')
+
+                // Raw data stored as Base64 string, convert back
+                'key'         => $record->get('key_type')   === self::TYPE_BIN ? base64_decode($record->get('key'))   : $record->get('key'),
+                'value'       => $record->get('value_type') === self::TYPE_BIN ? base64_decode($record->get('value')) : $record->get('value'),
             ];
          }
 
@@ -234,6 +264,27 @@ class Manticore
 
             default:
                 return 0;
+        }
+    }
+
+    private function _type(mixed $value, ?int &$type = null): int
+    {
+        switch (true)
+        {
+            case false === mb_detect_encoding((string) $value, null, true):
+                return $type = self::TYPE_BIN;
+
+            case base64_encode(base64_decode((string) $value, true)) === $value:
+                return $type = self::TYPE_BASE_64;
+
+            case null !== json_decode((string) $value, null, 2147483647):
+                return $type = self::TYPE_JSON;
+
+            case false !== simplexml_load_string((string) $value):
+                return $type = self::TYPE_XML;
+
+            default:
+                return $type = self::TYPE_TEXT;
         }
     }
 }
