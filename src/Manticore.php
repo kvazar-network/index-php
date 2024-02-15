@@ -342,7 +342,7 @@ class Manticore
             case is_string($value) && preg_match('/[^\s]{128,}/', $value) && base64_encode((string) base64_decode($value, true)) === $value:
                 return self::TYPE_BASE_64;
 
-            case is_string($value) && !is_numeric($value) && json_encode(json_decode($value)) === $value:
+            case is_string($value) && !is_numeric($value) && json_decode($value, null, 2147483647): // null|false already checked above
                 return self::TYPE_JSON;
 
             case is_string($value) && preg_match('/<\/[^>]+>/', $value):
