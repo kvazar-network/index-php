@@ -130,7 +130,7 @@ class Manticore
         {
             if (false === $key = json_encode($key))
             {
-                throw new Exception();
+                return null;
             }
         }
 
@@ -138,7 +138,7 @@ class Manticore
         {
             if (false === $value = json_encode($value))
             {
-                throw new Exception();
+                return null;
             }
         }
 
