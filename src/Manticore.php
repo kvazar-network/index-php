@@ -6,6 +6,7 @@ namespace Kvazar\Index;
 
 use Manticoresearch\Client;
 use Manticoresearch\Index;
+use Manticoresearch\Utils;
 
 class Manticore
 {
@@ -181,10 +182,18 @@ class Manticore
         ?array  $filter = [],
         ?array  $sort   = ['id' => 'desc'],
         ?int    $offset = 0,
-        ?int    $limit  = 10
+        ?int    $limit  = 10,
+        ?bool   $escape = true
     ): array
     {
         $records = [];
+
+        if ($escape)
+        {
+            $query = @\Utils::escape(
+                $query
+            );
+        }
 
         $search = $this->_index->search(
             $query
