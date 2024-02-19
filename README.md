@@ -5,7 +5,8 @@ Versioned drivers to create and read KVAZAR index in different applications
 ## Install
 
 * `apt install composer manticore php-fpm php-pdo`
-* `composer require kvazar/index:dev-main`
+* `composer require kvazar/index` - stable
+  * `composer require kvazar/index:dev-main` - development
 
 ## Usage
 
