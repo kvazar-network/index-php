@@ -190,7 +190,7 @@ class Manticore
 
         if ($escape)
         {
-            $query = @\Utils::escape(
+            $query = @Utils::escape(
                 $query
             );
         }
